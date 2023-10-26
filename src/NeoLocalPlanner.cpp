@@ -255,6 +255,7 @@ geometry_msgs::msg::TwistStamped NeoLocalPlanner::computeVelocityCommands(
 
 	// calc dynamic lookahead distances
 	lookahead_dist = m_lookahead_dist + fmax(fabs(start_vel_x), 0) * lookahead_time;
+	// bug:: 这个地方不对吧
 	cost_y_lookahead_dist = m_cost_y_lookahead_dist + fmax(start_vel_x, 0) * cost_y_lookahead_time;
 
 	// predict future pose (using second order midpoint method)
@@ -262,8 +263,9 @@ geometry_msgs::msg::TwistStamped NeoLocalPlanner::computeVelocityCommands(
 	double actual_yaw = 0;
 	{
 		const double midpoint_yaw = start_yaw + start_yawrate * lookahead_time / 2;
-		actual_pos = local_pose.getOrigin() + tf2::Matrix3x3(createQuaternionFromYaw(midpoint_yaw))
-												* tf2::Vector3(start_vel_x, start_vel_y, 0) * lookahead_time;
+		actual_pos = local_pose.getOrigin() + 
+					tf2::Matrix3x3(createQuaternionFromYaw(midpoint_yaw))
+					* tf2::Vector3(start_vel_x, start_vel_y, 0) * lookahead_time;
 		actual_yaw = start_yaw + start_yawrate * lookahead_time;
 	}
 
